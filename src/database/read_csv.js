@@ -1,6 +1,6 @@
 const fs = require('fs');
 const csv = require('csv-parser');
-const User = require('./src/models/User'); 
+const User = require('../models/User'); 
 
 const results = [];
 const csv_file_path = './users.csv'
