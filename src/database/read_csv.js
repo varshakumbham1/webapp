@@ -1,9 +1,10 @@
 const fs = require('fs');
 const csv = require('csv-parser');
-const User = require('../models/User'); 
+const User = require('../models/User');
 
 const results = [];
 const csv_file_path = './users.csv'
+
 async function insert_rows_into_table() {
   fs.createReadStream(csv_file_path)
     .pipe(csv())

@@ -1,10 +1,10 @@
 const Sequelize = require('sequelize')
 const sequelize = require('../database/index')
-
+const bcrypt = require('bcrypt');
 const User = sequelize.define('User', {
 	user_id:{
-		type:Sequelize.INTEGER,
-		autoIncrement:true,
+		type:Sequelize.UUID,
+    defaultValue: Sequelize.UUIDV4,
 		allowNull:false,
 		primaryKey:true
 	},
@@ -20,7 +20,10 @@ const User = sequelize.define('User', {
   updatedAt: 'account_updated'
 })
 
-// Exporting User, using this constant
-// we can perform CRUD operations on
-// 'user' table.
+User.beforeCreate(async (user) => {
+  const saltRounds = 10;
+  const hashedPassword = await bcrypt.hash(user.password, saltRounds);
+  user.password = hashedPassword;
+});
+
 module.exports = User
