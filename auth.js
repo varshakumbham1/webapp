@@ -1,13 +1,17 @@
 const User = require('./src/models/User')
 const bcrypt = require('bcrypt')
 const authenticate = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    return res.status(401).send('Unauthorized: No credentials provided.');
-  }
-  const credentials = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
-  const email = credentials[0];
-  const password = credentials[1];
+    const authHeader = req.headers.authorization;
+//   if (!authHeader) {
+//     return res.status(401).send('Unauthorized: No credentials provided.');
+//   }
+//   const credentials = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
+//   const email = credentials[0];
+//   const password = credentials[1];
+//   const user = await User.findOne({ where: { email } });
+  const credentials = getCredentials(authHeader)
+  const email = credentials[0]
+  const password = credentials[1]
   const user = await User.findOne({ where: { email } });
   if (!user) {
     return res.status(401).send('Unauthorized: Access denied.');
@@ -20,4 +24,16 @@ const authenticate = async (req, res, next) => {
   }
 }
 
-module.exports = authenticate
+const getCredentials =  (authHeader) => {
+    if (!authHeader) {
+        return res.status(401).send('Unauthorized: No credentials provided.');
+    }
+    const credentials = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
+    return credentials
+}
+  
+
+module.exports = {
+    authenticate,
+    getCredentials,
+};
