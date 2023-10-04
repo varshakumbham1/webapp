@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node Tests/healthz.test.js",
+    "test": "mocha Tests/healthz.test.js",
     "start": "node app.js"
   },
   "author": "",
@@ -16,7 +16,11 @@
     "express-basic-auth": "^1.2.1",
     "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
+    "mocha": "^10.2.0",
     "mysql2": "^3.6.1",
     "sequelize": "^6.33.0"
+  },
+  "devDependencies": {
+    "supertest": "^6.3.3"
   }
 }
