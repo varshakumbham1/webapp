@@ -32,7 +32,7 @@ jobs:
       - name: Install project dependencies
         run: npm install
       - name: Start Node.js app
-        run: npm start 
+        run: sudo npm start 
       - name: Run tests
-        run: npm test
+        run: sudo npm test
       
