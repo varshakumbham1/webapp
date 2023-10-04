@@ -23,16 +23,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y mysql-server
         env:
-          MYSQL_ROOT_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: "password"
 
       - name: Start MySQL service
         run: sudo service mysql start
 
       - name: Create Database
         run: |
-          mysql -u root -ppassword -e "CREATE DATABASE sequelize_db;"
+          mysql -u root -p"password" -e "CREATE DATABASE sequelize_db;"
         env:
-          MYSQL_ROOT_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: "password"
 
       - name: Install project dependencies
         run: npm install
