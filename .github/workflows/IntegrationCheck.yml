@@ -31,8 +31,6 @@ jobs:
           done
       - name: Install project dependencies
         run: npm install
-      - name: Start Node.js app
-        run: npm start 
       - name: Run tests
         run: npm test
       
