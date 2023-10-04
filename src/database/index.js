@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize')
+
 const sequelize = new Sequelize(
-  'sequelize_db',
+  'Cloud_db',
   'root',
   'Geethareddy@1989',
   {

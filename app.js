@@ -11,13 +11,31 @@ const port = 3000;
 const insert_row = require('./src/database/read_csv')
 app.use(express.json());
 
+const createDatabase = async () => {
+    //const { host, username, password, database } = config;
+    const database = 'Cloud_db'
+    const connection = await mysql.createConnection({
+      host: 'localhost',
+      user: 'root',
+      password: 'Geethareddy@1989'
+    });
+     connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
+  };
+
 app.listen(port, async () => {
     console.log(`Server is running on port ${port}`);
   });
 
-sequelize.sync({ alter: true }).then(() => {
-    insert_row()
-})
+(async () => {
+try {
+    await createDatabase();
+    await sequelize.sync({ alter: true }).then(() => {
+        insert_row()
+    })
+} catch (error) {
+    console.error("Error:", error);
+}
+})();
 
 User.hasMany(Assignment, {
     foreignKey: 'user_id', 
@@ -25,6 +43,8 @@ User.hasMany(Assignment, {
 Assignment.belongsTo(User, {
     foreignKey: 'user_id', 
 });
+
+
 
 app.use('/assignments', assignmentRouter);
 app.use('/healthz', healthzRouter);
