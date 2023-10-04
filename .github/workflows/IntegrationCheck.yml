@@ -31,8 +31,5 @@ jobs:
           done
       - name: Install project dependencies
         run: npm install
-      - name: Start Node.js app
-        run: sudo npm start 
       - name: Run tests
-        run: sudo npm test
-      
+        run: npm test
