@@ -11,6 +11,9 @@ router.post('/', authenticate ,async (req, res) => {
       const user = await User.findOne({ where: { email } });
       const userId = user.user_id;
       const { name, points, num_of_attempts, deadline } = req.body;
+      if (!name || !points || !num_of_attempts || !deadline) {
+        return res.status(400).json({ message: 'Invalid request body' });
+      }
       const assignment = await Assignment.create({
         name,
         points,
@@ -65,7 +68,10 @@ router.put('/:assignmentId', authenticate ,async (req, res) => {
         return res.status(404).json({ error: 'Assignment not found' });
       }
       if (assignment.user_id !== userId) {
-        return res.status(401).json({ error: 'Unauthorized - You do not have permission to update this assignment' });
+        return res.status(403).json({ error: 'Forbidden - You do not have permission to update this assignment' });
+      }
+      if (!name || !points || !num_of_attempts || !deadline) {
+        return res.status(400).json({ message: 'Invalid request body' });
       }
       assignment.name = name || assignment.name;
       assignment.points = points || assignment.points;
@@ -95,7 +101,7 @@ router.delete('/:assignmentId', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'Assignment not found' });
     }
     if (assignment.user_id !== userId) {
-      return res.status(401).json({ error: 'Unauthorized - You do not have permission to delete this assignment' });
+      return res.status(403).json({ error: 'Forbidden - You do not have permission to delete this assignment' });
     }
     await assignment.destroy();
     return res.status(204).send();
