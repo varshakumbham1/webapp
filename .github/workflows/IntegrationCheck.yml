@@ -31,5 +31,7 @@ jobs:
           done
       - name: Install project dependencies
         run: npm install
+      - name: Run the project
+        run: npm start
       - name: Run tests
         run: npm test
