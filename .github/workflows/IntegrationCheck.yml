@@ -31,7 +31,5 @@ jobs:
           done
       - name: Install project dependencies
         run: npm install
-        working-directory: ./webapp
       - name: Run tests
         run: npm test
-        working-directory: ./webapp
