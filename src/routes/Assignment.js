@@ -27,7 +27,7 @@ router.post('/', authenticate ,async (req, res) => {
       console.error(error);
       return res.status(500).json({ error: 'Internal server error' });
     }
-  });
+});
 
 router.get('/', authenticate, async (req, res) => {
   try {
@@ -81,7 +81,7 @@ router.put('/:assignmentId', authenticate ,async (req, res) => {
       console.error(error);
       return res.status(500).json({ error: 'Internal server error' });
     }
-  });
+});
 
 router.delete('/:assignmentId', authenticate, async (req, res) => {
   try {
@@ -105,5 +105,8 @@ router.delete('/:assignmentId', authenticate, async (req, res) => {
   }
 });
 
+router.patch('/*', authenticate, (req, res) => {
+    res.status(405).json({ error: 'Method Not Allowed' });
+});
 
 module.exports = router;

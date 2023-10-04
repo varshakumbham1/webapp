@@ -5,6 +5,7 @@ const User = require('./src/models/User')
 const Assignment = require('./src/models/Assignment')
 const { authenticate, getCredentials } = require('./auth')
 const assignmentRouter = require('./src/routes/Assignment');
+const healthzRouter = require('./src/routes/Healthz')
 const app = express()
 const port = 3000;
 const insert_row = require('./src/database/read_csv')
@@ -25,10 +26,27 @@ Assignment.belongsTo(User, {
     foreignKey: 'user_id', 
 });
 
-app.get('/api/protected', authenticate, (req, res) => {
-    credentials = getCredentials(req.headers.authorization)
-    res.status(200).json({ message: 'Authenticated endpoint' });
-});
-
 app.use('/assignments', assignmentRouter);
+app.use('/healthz', healthzRouter);
 
+// app.get('/healthz', async (req, res) => {
+//     try {
+//         res.set('Cache-Control', 'no-cache');
+//         if(Object.keys(req.body).length > 0) {
+//             res.status(400).send();
+//         }
+//         if(Object.keys(req.query).length > 0) {
+//             res.status(400).send()
+//         }
+//         else {
+//             await sequelize.authenticate()
+//             res.status(200).send()
+//         }
+//       } catch (error) {
+//             res.status(503).send()
+//       }
+// });
+
+// app.use('/healthz', healthzRouter, (req, res, next) => {
+    
+// });
