@@ -42,13 +42,6 @@ app.get('/healthz', async (req, res) => {
       }
 });
 
-app.all('/healthz', (req, res) => {
-    if (req.method !== 'GET') { 
-      res.status(405).send();
-      console.log("Method Not Allowed");
-    }
-})
-
 app.listen(port, async () => {
     console.log(`Server is running on port ${port}`);
 });
