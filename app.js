@@ -3,7 +3,8 @@ const {sequelize, createDatabase, syncDatabase, User, Assignment} = require('./s
 const { authenticate, getCredentials } = require('./auth')
 const assignmentRouter = require('./src/routes/Assignment');
 const app = express()
-const port = 3000;
+require('dotenv').config();
+const port = process.env.PORT
 const insert_row = require('./src/database/read_csv')
 app.use(express.json());
 

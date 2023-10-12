@@ -1,9 +1,10 @@
 const fs = require('fs');
 const csv = require('csv-parser');
 const { User } = require('../database/index');
+require('dotenv').config();
 
 const results = [];
-const csv_file_path = '/opt/users.csv'
+const csv_file_path = process.env.CSV_FILE
 
 async function insert_rows_into_table() {
   fs.createReadStream(csv_file_path)

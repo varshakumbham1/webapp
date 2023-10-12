@@ -16,7 +16,7 @@ run npm install to install packages
 Once node_modules is installed. create a .env file and add db details and port details.
 
 DB_HOSTNAME = localhost
-DB_PASSWORD = Geethareddy@1989
+DB_PASSWORD = ********
 DB_USER = root
 DB_NAME = Cloud_db
 DB_DIALECT = mysql

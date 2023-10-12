@@ -4,24 +4,17 @@ const mysql = require("mysql2/promise");
 const UserModel = require("../models/User");
 const AssignmentModel = require("../models/Assignment");
 
-// require('dotenv').config();
-// const database = process.env.database
-// const user = process.env.username
-// const password = process.env.password
-// const dialectName = process.env.dialect
-// const host = process.env.host
-const database = 'Cloud_db'
-const user = 'root'
-const password = 'Geethareddy@1989'
-const host = 'localhost'
-const dialectName = 'mysql'
+require('dotenv').config();
+const database = process.env.DB_NAME
+const user = process.env.DB_USER
+const password = process.env.DB_PASSWORD
+const host = process.env.DB_HOST
+const dialect = process.env.DB_DIALECT;
 
-const sequelize = new Sequelize(
-  database, user, password, 
-  {
-    dialect: dialectName,
-    host: host
-  })
+const sequelize = new Sequelize(database, user, password, {
+  host: host,
+  dialect: dialect,
+});
 
 const User = UserModel(sequelize);
 const Assignment = AssignmentModel(sequelize);
