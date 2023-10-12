@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
-const Assignment = require('../models/Assignment'); 
+const {User, Assignment} = require('../database/index');
 const { authenticate, getCredentials } = require('../../auth')
 
 router.post('/', authenticate ,async (req, res) => {
@@ -10,9 +9,12 @@ router.post('/', authenticate ,async (req, res) => {
       const email = credentials[0]
       const user = await User.findOne({ where: { email } });
       const userId = user.user_id;
-      const { name, points, num_of_attempts, deadline } = req.body;
+      const { name, points, num_of_attempts, deadline, assignment_created, assignment_updated } = req.body;
       if (!name || !points || !num_of_attempts || !deadline) {
         return res.status(400).json({ message: 'Invalid request body' });
+      }
+      if(!Number.isInteger(points) || !Number.isInteger(num_of_attempts)){
+        return res.status(400).json({message: 'Points or Number of attempts must be integer'})
       }
       if(assignment_created || assignment_updated) {
         return res.status(403).send()
@@ -24,7 +26,7 @@ router.post('/', authenticate ,async (req, res) => {
         deadline,
         user_id: userId,
       }).then((assignment) => {
-        return res.status(201).json({ assignment });
+        return res.status(201).json(assignment);
       })
       .catch((error) => {
         return res.status(400).json({ message: "Validation error for points and attempts" });
@@ -65,11 +67,14 @@ router.put('/:assignmentId', authenticate ,async (req, res) => {
       const email = credentials[0]
       const user = await User.findOne({ where: { email } });
       const userId = user.user_id;
-      const { name, points, num_of_attempts, deadline } = req.body;
+      const { name, points, num_of_attempts, deadline, assignment_created, assignment_updated } = req.body;
       const assignment = await Assignment.findByPk(req.params.assignmentId)
       if (!assignment) {
         return res.status(404).json({ error: 'Assignment not found' });
       }
+      if(!Number.isInteger(points) || !Number.isInteger(num_of_attempts)){
+        return res.status(400).json({message: 'Points or Number of attempts must be integer'})
+    }
       if (assignment.user_id !== userId) {
         return res.status(403).json({ error: 'Forbidden - You do not have permission to update this assignment' });
       }
@@ -84,7 +89,7 @@ router.put('/:assignmentId', authenticate ,async (req, res) => {
       assignment.num_of_attempts = num_of_attempts || assignment.num_of_attempts;
       assignment.deadline = deadline || assignment.deadline;
       await assignment.save().then((assignment) => {
-        return res.status(200).json({ assignment });
+        return res.status(204).send();
       })
       .catch((error) => {
         return res.status(400).json({ message: "Validation error for points and attempts" });

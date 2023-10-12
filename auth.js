@@ -1,4 +1,4 @@
-const User = require('./src/models/User')
+const { User } = require('./src/database/index')
 const bcrypt = require('bcrypt')
 const authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
