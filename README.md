@@ -12,7 +12,6 @@ Steps to deploy it locally.
 clone fork repo: git clone git@github.com:varshakumbham1/webapp.git
 
 run npm install to install packages
-
 Once node_modules is installed. create a .env file and add db details and port details.
 
 DB_HOSTNAME = localhost
