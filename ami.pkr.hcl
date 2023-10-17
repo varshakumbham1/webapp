@@ -62,20 +62,6 @@ source "amazon-ebs" "my-ami" {
 
 build {
   sources = ["source.amazon-ebs.my-ami"]
-  provisioner "file" {
-    // source      = "dist/main.js"
-    source      = fileexists("dist/main.js") ? "dist/main.js" : "/"
-    destination = "/home/admin/webapp"
-  }
-  provisioner "file" {
-    // source      = ".env"
-    source      = fileexists(".env") ? ".env" : "/"
-    destination = "/home/admin/webapp/.env"
-  }
-  provisioner "file" {
-    source      = "package.json"
-    destination = "/home/admin/webapp/package.json"
-  }
   provisioner "shell" {
     inline = [
       "sudo apt update",
@@ -88,10 +74,27 @@ build {
       "EOF",
       "sudo apt update",
       "sudo apt install -y nodejs npm",
-      "cd ~/",
-      "sudo mkdir webapp",
-      "sudo chmod 777 webapp",
-      "cd ~/webapp && npm install",
+      "sudo mkdir -p ~/webapp/dist",
+      "sudo chmod -R 777 webapp",
+    ]
+  }
+  provisioner "file" {
+    // source      = "dist/main.js"
+    source      = fileexists("dist/main.js") ? "dist/main.js" : "/"
+    destination = "/home/admin/webapp/dist/main.js"
+  }
+  provisioner "file" {
+    // source      = ".env"
+    source      = fileexists(".env") ? ".env" : "/"
+    destination = "/home/admin/webapp/.env"
+  }
+  provisioner "file" {
+    source      = "package.json"
+    destination = "/home/admin/webapp/package.json"
+  }
+  provisioner "shell" {
+    inline = [
+      "cd ~/webapp && npm install"
     ]
   }
 }

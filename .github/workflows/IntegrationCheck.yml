@@ -37,6 +37,13 @@ jobs:
         run: npm test
       - name: Build the web app
         run: npm run build
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: my-repo
+          path: |
+            dist/main.js
+            .env
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v1
         with:
