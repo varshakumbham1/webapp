@@ -95,7 +95,7 @@ build {
       "cd ~/webapp",
       "export $(cat .env)",
       "sudo mysql -u $DB_USER <<EOF",
-      "ALTER USER '$DB_USER'@'$DB_HOST' IDENTIFIED BY '$DB_PASSWORD';",
+      "ALTER USER '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASSWORD';",
       "FLUSH PRIVILEGES;",
       "EOF",
       "sudo apt update",
