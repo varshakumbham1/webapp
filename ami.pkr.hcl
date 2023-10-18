@@ -32,6 +32,11 @@ variable "subnet_id" {
   default = "subnet-0a48a5291be72d163"
 }
 
+variable "ami_users" {
+  type    = list(string)
+  default = ["851715934935"]
+}
+
 # https://www.packer.io/plugins/builders/amazon/ebs
 source "amazon-ebs" "my-ami" {
   region          = "${var.aws_region}"
@@ -40,7 +45,8 @@ source "amazon-ebs" "my-ami" {
   ami_regions = [
     "us-east-1",
   ]
-  profile = "${var.aws_profile}"
+  profile   = "${var.aws_profile}"
+  ami_users = "${var.ami_users}"
   aws_polling {
     delay_seconds = 120
     max_attempts  = 50
@@ -92,9 +98,15 @@ build {
     source      = "package.json"
     destination = "/home/admin/webapp/package.json"
   }
+  provisioner "file" {
+    source      = "Users.csv"
+    destination = "/home/admin/webapp/Users.csv"
+  }
   provisioner "shell" {
     inline = [
+      "sudo mv ~/webapp/Users.csv /opt/",
       "cd ~/webapp && npm install"
     ]
   }
+
 }

@@ -1,10 +1,10 @@
-name: Integration Test
+name: Build Ami
 on:
   push:
     branches:
       - main
 jobs:
-  integration-test:
+  build-ami:
     runs-on: ubuntu-latest
     services:
       mysql:
