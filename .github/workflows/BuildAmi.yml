@@ -59,6 +59,6 @@ jobs:
           packer --version
         shell: bash
       - name: Init packer file
-        run: packer init ./ami.pkr.hcl
+        run: packer init .
       - name: Build packer file
-        run: packer build ./ami.pkr.hcl
+        run: packer build .
