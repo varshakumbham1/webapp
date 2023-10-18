@@ -89,6 +89,9 @@ build {
       "sudo apt install -y mariadb-server",
       "sudo systemctl start mariadb",
       "sudo systemctl enable mariadb",
+      "sudo mkdir -p ~/webapp/dist",
+      "sudo chmod -R 777 webapp",
+      "cd ~/webapp",
       "source .env",
       "sudo mysql -u $DB_USER <<EOF",
       "ALTER USER '$DB_USER'@'$DB_HOST' IDENTIFIED BY '$DB_PASSWORD';",
@@ -96,8 +99,6 @@ build {
       "EOF",
       "sudo apt update",
       "sudo apt install -y nodejs npm",
-      "sudo mkdir -p ~/webapp/dist",
-      "sudo chmod -R 777 webapp",
     ]
   }
   provisioner "file" {
