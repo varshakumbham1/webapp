@@ -81,7 +81,7 @@ build {
   provisioner "file" {
     // source      = ".env"
     source      = fileexists(".env") ? ".env" : "/"
-    destination = "/home/admin/webapp/.env"
+    destination = "/home/admin/.env"
   }
   provisioner "shell" {
     inline = [
@@ -92,6 +92,7 @@ build {
       "sudo mkdir -p ~/webapp/dist",
       "sudo chmod -R 777 webapp",
       "cd ~/webapp",
+      "sudo mv ~/.env ~/webapp/.env",
       "source .env",
       "sudo mysql -u $DB_USER <<EOF",
       "ALTER USER '$DB_USER'@'$DB_HOST' IDENTIFIED BY '$DB_PASSWORD';",
