@@ -22,10 +22,10 @@ jobs:
       - name: Format Packer Template
         run: |
           set -e
-          packer fmt -check ami.pkr.hcl
+          packer fmt -check .
           echo "Packer formatting check passed for ami.pkr.hcl"
       - name: Validate Packer Template
         run: |
           set -e
-          packer validate ami.pkr.hcl
+          packer validate .
           echo "Packer validation check passed for ami.pkr.hcl"
