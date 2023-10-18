@@ -1,11 +1,8 @@
 name: Packer Checks
 on:
   pull_request:
-    paths:
-      - 'ami.pkr.hcl'
-    types:
-      - opened
-      - synchronize
+    branches:
+      - main
 jobs:
   packer_validation:
     runs-on: ubuntu-latest
