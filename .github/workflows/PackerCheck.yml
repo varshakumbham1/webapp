@@ -19,9 +19,13 @@ jobs:
         shell: bash
       - name: Install packer plugins
         run: packer plugins install github.com/hashicorp/amazon
-      - name: Format and validate Packer Template
+      - name: Format Packer Template
         run: |
           set -e
           packer fmt -check ami.pkr.hcl
+          echo "Packer formatting check passed for ami.pkr.hcl"
+      - name: Validate Packer Template
+        run: |
+          set -e
           packer validate ami.pkr.hcl
-          echo "Packer formatting and validation check passed for ami.pkr.hcl"
+          echo "Packer validation check passed for ami.pkr.hcl"

@@ -37,16 +37,21 @@ variable "ami_users" {
   default = ["851715934935"]
 }
 
+variable "ami_regions" {
+  type = list(string)
+  default = [
+    "us-east-1",
+  ]
+}
+
 # https://www.packer.io/plugins/builders/amazon/ebs
 source "amazon-ebs" "my-ami" {
   region          = "${var.aws_region}"
   ami_name        = "csye6225_${formatdate("YYYY_MM_DD_hh_mm_ss", timestamp())}"
   ami_description = "AMI for CSYE 6225"
-  ami_regions = [
-    "us-east-1",
-  ]
-  profile   = "${var.aws_profile}"
-  ami_users = "${var.ami_users}"
+  ami_regions     = "${var.ami_regions}"
+  profile         = "${var.aws_profile}"
+  ami_users       = "${var.ami_users}"
   aws_polling {
     delay_seconds = 120
     max_attempts  = 50
@@ -74,8 +79,9 @@ build {
       "sudo apt install -y mariadb-server",
       "sudo systemctl start mariadb",
       "sudo systemctl enable mariadb",
-      "sudo mysql -u root <<EOF",
-      "ALTER USER 'root'@'localhost' IDENTIFIED BY 'Geethareddy@1989';",
+      "source .env",
+      "sudo mysql -u $DB_USER <<EOF",
+      "ALTER USER '$DB_USER'@'$DB_HOST' IDENTIFIED BY '$DB_PASSWORD';",
       "FLUSH PRIVILEGES;",
       "EOF",
       "sudo apt update",
