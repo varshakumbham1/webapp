@@ -78,15 +78,9 @@ source "amazon-ebs" "my-ami" {
 
 build {
   sources = ["source.amazon-ebs.my-ami"]
-  provisioner "file" {
-    // source      = ".env"
-    source      = fileexists(".env") ? ".env" : "/"
-    destination = "/home/admin/.env"
-  }
   provisioner "shell" {
     inline = [
       "sudo mkdir -p ~/webapp/dist",
-      "sudo mv ~/.env ~/webapp/.env",
       "sudo apt update",
       "sudo apt install -y nodejs npm",
     ]
