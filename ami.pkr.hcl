@@ -85,19 +85,8 @@ build {
   }
   provisioner "shell" {
     inline = [
-      "sudo apt update",
-      "sudo apt install -y mariadb-server",
-      "sudo systemctl start mariadb",
-      "sudo systemctl enable mariadb",
       "sudo mkdir -p ~/webapp/dist",
-      "sudo chmod -R 777 webapp",
       "sudo mv ~/.env ~/webapp/.env",
-      "cd ~/webapp",
-      "export $(cat .env)",
-      "sudo mysql -u $DB_USER <<EOF",
-      "ALTER USER '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASSWORD';",
-      "FLUSH PRIVILEGES;",
-      "EOF",
       "sudo apt update",
       "sudo apt install -y nodejs npm",
     ]
