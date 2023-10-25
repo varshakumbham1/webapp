@@ -1,0 +1,19 @@
+[Unit]
+Description=Web App
+ConditionPathExists=/home/admin/webapp
+After=network.target
+
+[Service]
+Type=simple
+User=csye6225
+Group=csye6225
+WorkingDirectory=/home/ec2-user/webapp
+ExecStart=/usr/bin/npm start
+Restart=always
+RestartSec=3
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=csye6225
+
+[Install]
+WantedBy=cloud-init.target

@@ -83,6 +83,8 @@ build {
       "mkdir -p ~/webapp/dist",
       "sudo apt update",
       "sudo apt install -y nodejs npm",
+      "sudo groupadd csye6225",
+      "sudo useradd -s /bin/false -g csye6225 -d /opt/csye6225 -m csye6225",
     ]
   }
   provisioner "file" {
@@ -98,10 +100,18 @@ build {
     source      = "Users.csv"
     destination = "/home/admin/webapp/Users.csv"
   }
+  provisioner "file" {
+    source      = "webapp.service"
+    destination = "/home/admin/webapp/webapp.service"
+  }
   provisioner "shell" {
     inline = [
       "sudo mv ~/webapp/Users.csv /opt/",
-      "cd ~/webapp && npm install"
+      "cd ~/webapp && npm install",
+      "sudo mv ~/webapp/webapp.service /etc/systemd/system/",
+      "sudo systemctl daemon-reload",
+      "sudo systemctl enable webapp",
+      "sudo systemctl start webapp"
     ]
   }
 
