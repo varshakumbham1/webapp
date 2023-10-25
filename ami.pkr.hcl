@@ -90,7 +90,7 @@ build {
   provisioner "file" {
     // source      = ".env"
     source      = fileexists(".env") ? ".env" : "/"
-    destination = "/home/admin/csye6225/webapp/.env"
+    destination = "/home/admin/webapp/.env"
   }
   provisioner "file" {
     // source      = "dist/main.js"
@@ -112,10 +112,10 @@ build {
   provisioner "shell" {
     inline = [
       "cd /home/admin/webapp && npm install",
-      "sudo mv /home/admin/webapp /opt/csye6225/",
-      "sudo mv /home/admin/webapp/Users.csv /opt/",
-      "sudo chown -R csye6225:csye6225 /opt/",
       "sudo mv /home/admin/webapp/webapp.service /etc/systemd/system/",
+      "sudo mv /home/admin/webapp/Users.csv /opt/",
+      "sudo mv /home/admin/webapp /opt/csye6225/",
+      "sudo chown -R csye6225:csye6225 /opt/",
       "sudo systemctl daemon-reload",
       "sudo systemctl enable webapp",
       "sudo systemctl start webapp"
