@@ -82,7 +82,7 @@ build {
     inline = [
       "sudo groupadd csye6225",
       "sudo useradd -s /bin/false -g csye6225 -d /opt/csye6225 -m csye6225",
-      "sudo mkdir -p /opt/csye6225/webapp/dist",
+      "sudo mkdir -p ~/webapp/dist",
       "sudo apt update",
       "sudo apt install -y nodejs npm",
     ]
@@ -90,30 +90,32 @@ build {
   provisioner "file" {
     // source      = ".env"
     source      = fileexists(".env") ? ".env" : "/"
-    destination = "/opt/csye6225/webapp/.env"
+    destination = "/home/admin/csye6225/webapp/.env"
   }
   provisioner "file" {
     // source      = "dist/main.js"
     source      = fileexists("dist/main.js") ? "dist/main.js" : "/"
-    destination = "/opt/csye6225/webapp/dist/main.js"
+    destination = "/home/admin/webapp/dist/main.js"
   }
   provisioner "file" {
     source      = "package.json"
-    destination = "/opt/csye6225/webapp/package.json"
+    destination = "/home/admin/webapp/package.json"
   }
   provisioner "file" {
     source      = "Users.csv"
-    destination = "/opt/Users.csv"
+    destination = "/home/admin/webapp/Users.csv"
   }
   provisioner "file" {
     source      = "webapp.service"
-    destination = "/opt/csye6225/webapp/webapp.service"
+    destination = "/home/admin/webapp/webapp.service"
   }
   provisioner "shell" {
     inline = [
-      "cd /opt/csye6225/webapp && npm install",
+      "cd /home/admin/webapp && npm install",
+      "sudo mv /home/admin/webapp /opt/csye6225/",
+      "sudo mv /home/admin/webapp/Users.csv /opt/",
       "sudo chown -R csye6225:csye6225 /opt/",
-      "sudo mv /opt/csye6225/webapp/webapp.service /etc/systemd/system/",
+      "sudo mv /home/admin/webapp/webapp.service /etc/systemd/system/",
       "sudo systemctl daemon-reload",
       "sudo systemctl enable webapp",
       "sudo systemctl start webapp"
