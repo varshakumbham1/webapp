@@ -82,7 +82,7 @@ build {
     inline = [
       "sudo groupadd csye6225",
       "sudo useradd -s /bin/false -g csye6225 -d /opt/csye6225 -m csye6225",
-      "sudo mkdir -p ~/webapp/dist",
+      "mkdir -p ~/webapp/dist",
       "sudo apt update",
       "sudo apt install -y nodejs npm",
     ]
