@@ -19,7 +19,7 @@ const authenticate = async (req, res, next) => {
 
 const getCredentials =  (authHeader) => {
     if (!authHeader) {
-        return res.status(401).send('Unauthorized: No credentials provided.');
+        return ["", ""]
     }
     const credentials = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
     return credentials

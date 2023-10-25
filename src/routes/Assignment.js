@@ -16,6 +16,12 @@ router.post('/', authenticate ,async (req, res) => {
       if(!Number.isInteger(points) || !Number.isInteger(num_of_attempts)){
         return res.status(400).json({message: 'Points or Number of attempts must be integer'})
       }
+      if (typeof name !== 'string') {
+        return res.status(400).json({ message: 'Name must be a string' });
+      }
+      if (typeof deadline !== 'string' || isNaN(Date.parse(deadline))) {
+        return res.status(400).json({ message: 'Deadline must be a valid date' });
+      }
       if(assignment_created || assignment_updated) {
         return res.status(403).send()
       }
@@ -26,7 +32,9 @@ router.post('/', authenticate ,async (req, res) => {
         deadline,
         user_id: userId,
       }).then((assignment) => {
-        return res.status(201).json(assignment);
+        const assignmentResponse = {...assignment.toJSON()}
+        delete assignmentResponse.user_id
+        return res.status(201).send(assignmentResponse);
       })
       .catch((error) => {
         return res.status(400).json({ message: "Validation error for points and attempts" });
@@ -39,8 +47,12 @@ router.post('/', authenticate ,async (req, res) => {
 
 router.get('/', authenticate, async (req, res) => {
   try {
-    const assignments = await Assignment.findAll();
-    return res.status(200).json({ assignments });
+    const assignments = await Assignment.findAll({
+      attributes: {
+        exclude: ['user_id'],
+      }
+    });
+    return res.status(200).json(assignmentsResponse);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -50,11 +62,17 @@ router.get('/', authenticate, async (req, res) => {
 router.get('/:assignmentId', authenticate, async (req, res) => {
   try {
     const assignmentId = req.params.assignmentId;
-    const assignment = await Assignment.findByPk(assignmentId);
+    const assignment = await Assignment.findByPk(assignmentId, {
+      attributes: {
+        exclude: ['user_id'],
+      },
+    });
     if (!assignment) {
       return res.status(404).json({ error: 'Assignment not found' });
     }
-    return res.status(200).json({ assignment });
+    const assignmentResponse = {...assignment.toJSON()}
+    delete assignmentResponse.user_id
+    return res.status(200).json(assignmentResponse);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -74,7 +92,13 @@ router.put('/:assignmentId', authenticate ,async (req, res) => {
       }
       if(!Number.isInteger(points) || !Number.isInteger(num_of_attempts)){
         return res.status(400).json({message: 'Points or Number of attempts must be integer'})
-    }
+      }
+      if (typeof name !== 'string') {
+        return res.status(400).json({ message: 'Name must be a string' });
+      }
+      if (typeof deadline !== 'string' || isNaN(Date.parse(deadline))) {
+        return res.status(400).json({ message: 'Deadline must be a valid date' });
+      }
       if (assignment.user_id !== userId) {
         return res.status(403).json({ error: 'Forbidden - You do not have permission to update this assignment' });
       }

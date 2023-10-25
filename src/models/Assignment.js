@@ -28,7 +28,7 @@ const model = (sequelize) => {
 			},
 		},
 		deadline: {
-			type: Sequelize.STRING,
+			type: Sequelize.DATE,
 			allowNull: false,
 		},
 		assignment_created: {
