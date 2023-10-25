@@ -52,7 +52,7 @@ router.get('/', authenticate, async (req, res) => {
         exclude: ['user_id'],
       }
     });
-    return res.status(200).json(assignmentsResponse);
+    return res.status(200).json(assignments);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -70,9 +70,7 @@ router.get('/:assignmentId', authenticate, async (req, res) => {
     if (!assignment) {
       return res.status(404).json({ error: 'Assignment not found' });
     }
-    const assignmentResponse = {...assignment.toJSON()}
-    delete assignmentResponse.user_id
-    return res.status(200).json(assignmentResponse);
+    return res.status(200).json(assignment);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Internal server error' });
