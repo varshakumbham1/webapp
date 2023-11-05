@@ -13,13 +13,12 @@ app.use(express.json());
       await createDatabase();
       await sequelize.sync({ alter: true });
       await insert_row();
-    } catch (error) {
-      logger.error(`Connection failed ${error}`);
-    }
-    finally {
       app.listen(port, () => {
         logger.info(`Server running on port: ${port}`);
       });
+    } catch (error) {
+      logger.error(`Connection failed ${error}`);
+      console.log(error)
     }
 })();
 
