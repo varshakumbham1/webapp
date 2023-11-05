@@ -14,7 +14,7 @@ app.use(express.json());
       await sequelize.sync({ alter: true });
       await insert_row();
     } catch (error) {
-      logger.error(`Database is stopped. Error: ${error}`);
+      logger.error(`Connection failed ${error}`);
     }
     finally {
       app.listen(port, () => {
