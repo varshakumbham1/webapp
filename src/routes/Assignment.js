@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {User, Assignment} = require('../database/index');
 const { authenticate, getCredentials } = require('../../auth')
-
+const logger = require("../logging/applog")
 router.post('/', authenticate ,async (req, res) => {
     try {
       const credentials = getCredentials(req.headers.authorization)
@@ -34,13 +34,15 @@ router.post('/', authenticate ,async (req, res) => {
       }).then((assignment) => {
         const assignmentResponse = {...assignment.toJSON()}
         delete assignmentResponse.user_id
+        logger.info(`Assignment created successfully with id: ${assignmentResponse.assignment_id}`);
         return res.status(201).send(assignmentResponse);
       })
       .catch((error) => {
+        logger.error(`Assignment cannot be created due to an error ${error}`);
         return res.status(400).json({ message: "Validation error for points and attempts" });
       });
     } catch (error) {
-      console.error(error);
+      logger.error(`Error occurred ${error}`);
       return res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -52,9 +54,10 @@ router.get('/', authenticate, async (req, res) => {
         exclude: ['user_id'],
       }
     });
+    logger.info(`Retrieved all the Assignments successfully`);
     return res.status(200).json(assignments);
   } catch (error) {
-    console.error(error);
+    logger.error(`Error occurred ${error}`);
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -70,9 +73,10 @@ router.get('/:assignmentId', authenticate, async (req, res) => {
     if (!assignment) {
       return res.status(404).json({ error: 'Assignment not found' });
     }
+    logger.info(`Assignment with id ${assignment.assignment_id} fetched successfully `);
     return res.status(200).json(assignment);
   } catch (error) {
-    console.error(error);
+    logger.error(`Error occurred ${error}`);
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -98,6 +102,7 @@ router.put('/:assignmentId', authenticate ,async (req, res) => {
         return res.status(400).json({ message: 'Deadline must be a valid date' });
       }
       if (assignment.user_id !== userId) {
+        logger.info(`Assignment with id ${assignment.assignment_id} is forbidden to update by ${email}`);
         return res.status(403).json({ error: 'Forbidden - You do not have permission to update this assignment' });
       }
       if (!name || !points || !num_of_attempts || !deadline) {
@@ -111,13 +116,14 @@ router.put('/:assignmentId', authenticate ,async (req, res) => {
       assignment.num_of_attempts = num_of_attempts || assignment.num_of_attempts;
       assignment.deadline = deadline || assignment.deadline;
       await assignment.save().then((assignment) => {
+        logger.info(`Assignment with id ${assignment.assignment_id} is updated successfully by ${email}`);
         return res.status(204).send();
       })
       .catch((error) => {
         return res.status(400).json({ message: "Validation error for points and attempts" });
       });
     } catch (error) {
-      console.error(error);
+      logger.error(`Error occurred ${error}`);
       return res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -134,12 +140,14 @@ router.delete('/:assignmentId', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'Assignment not found' });
     }
     if (assignment.user_id !== userId) {
+      logger.info(`Assignment with id ${assignment.assignment_id} is forbidden to update by ${email}`);
       return res.status(403).json({ error: 'Forbidden - You do not have permission to delete this assignment' });
     }
     await assignment.destroy();
+    logger.info(`Assignment with id ${assignment.assignment_id} is deleted successfully by ${email}`);
     return res.status(204).send();
   } catch (error) {
-    console.error(error);
+    logger.error(`Error occurred ${error}`);
     return res.status(500).json({ error: 'Internal server error' });
   }
 });

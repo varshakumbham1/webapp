@@ -109,6 +109,10 @@ build {
     source      = "webapp.service"
     destination = "/home/admin/webapp/webapp.service"
   }
+  provisioner "file" {
+    source      = "cloud-watch-config.json"
+    destination = "/tmp/cloudwatch-agent-config.json"
+  }
   provisioner "shell" {
     inline = [
       "cd /home/admin/webapp && npm install",
@@ -118,8 +122,12 @@ build {
       "sudo chown -R csye6225:csye6225 /opt/",
       "sudo systemctl daemon-reload",
       "sudo systemctl enable webapp",
-      "sudo systemctl start webapp"
+      "sudo systemctl start webapp",
+      "wget https://amazoncloudwatch-agent.s3.amazonaws.com/debian/amd64/latest/amazon-cloudwatch-agent.deb",
+      "sudo dpkg -i -E ./amazon-cloudwatch-agent.deb",
+      "sudo mv /tmp/cloudwatch-agent-config.json /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json",
+      "sudo systemctl enable amazon-cloudwatch-agent",
+      "sudo systemctl start amazon-cloudwatch-agent"
     ]
   }
-
 }

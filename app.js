@@ -6,19 +6,20 @@ const app = express()
 require('dotenv').config();
 const port = process.env.PORT
 const insert_row = require('./src/database/read_csv')
+const logger = require('./src/logging/applog')
 app.use(express.json());
-
 (async () => {
     try {
       await createDatabase();
       await sequelize.sync({ alter: true });
       await insert_row();
-  
-      app.listen(port, () => {
-        console.log("Server running on port", port);
-      });
     } catch (error) {
-      console.error("Error:", error);
+      logger.error(`Database is stopped. Error: ${error}`);
+    }
+    finally {
+      app.listen(port, () => {
+        logger.info(`Server running on port: ${port}`);
+      });
     }
 })();
 
@@ -42,9 +43,11 @@ app.get('/healthz', async (req, res) => {
         }
         else {
             await sequelize.authenticate()
+            logger.info(`/heathz connection successful`);
             res.status(200).send()
         }
       } catch (error) {
+            logger.error(`/healthz connection failed: ${error}`);
             res.status(503).send()
       }
 });
