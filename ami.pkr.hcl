@@ -115,10 +115,11 @@ build {
   }
   provisioner "file" {
     source      = "cloud-watch-config.json"
-    destination = "/home/admin/webapp/cloud-watch-config.json"
+    destination = "/tmp/cloudwatch-agent-config.json"
   }
   provisioner "shell" {
     inline = [
+      "sudo mv /tmp/cloudwatch-agent-config.json /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json",
       "cd /home/admin/webapp && npm install",
       "sudo mv /home/admin/webapp/webapp.service /etc/systemd/system/",
       "sudo mv /home/admin/webapp/Users.csv /opt/",
