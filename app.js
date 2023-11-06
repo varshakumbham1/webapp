@@ -7,6 +7,7 @@ require('dotenv').config();
 const port = process.env.PORT
 const insert_row = require('./src/database/read_csv')
 const logger = require('./src/logging/applog')
+const statsd = require('./src/metrics/metrics')
 app.use(express.json());
 (async () => {
     try {
@@ -33,6 +34,7 @@ app.use('/v1/assignments', assignmentRouter);
 
 app.get('/healthz', async (req, res) => {
     try {
+        statsd.increment('api.healthz');
         res.set('Cache-Control', 'no-cache');
         if(Object.keys(req.body).length > 0) {
             res.status(400).send();

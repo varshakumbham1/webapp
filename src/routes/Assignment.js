@@ -3,8 +3,10 @@ const router = express.Router();
 const {User, Assignment} = require('../database/index');
 const { authenticate, getCredentials } = require('../../auth')
 const logger = require("../logging/applog")
+const statsd = require('../metrics/metrics')
 router.post('/', authenticate ,async (req, res) => {
     try {
+      statsd.increment('api.post');
       const credentials = getCredentials(req.headers.authorization)
       const email = credentials[0]
       const user = await User.findOne({ where: { email } });
@@ -49,6 +51,7 @@ router.post('/', authenticate ,async (req, res) => {
 
 router.get('/', authenticate, async (req, res) => {
   try {
+    statsd.increment('api.get');
     const assignments = await Assignment.findAll({
       attributes: {
         exclude: ['user_id'],
@@ -64,6 +67,7 @@ router.get('/', authenticate, async (req, res) => {
 
 router.get('/:assignmentId', authenticate, async (req, res) => {
   try {
+    statsd.increment('api.getAssignment');
     const assignmentId = req.params.assignmentId;
     const assignment = await Assignment.findByPk(assignmentId, {
       attributes: {
@@ -83,6 +87,7 @@ router.get('/:assignmentId', authenticate, async (req, res) => {
 
 router.put('/:assignmentId', authenticate ,async (req, res) => {
     try {
+      statsd.increment('api.put');
       const credentials = getCredentials(req.headers.authorization)
       const email = credentials[0]
       const user = await User.findOne({ where: { email } });
@@ -130,6 +135,7 @@ router.put('/:assignmentId', authenticate ,async (req, res) => {
 
 router.delete('/:assignmentId', authenticate, async (req, res) => {
   try {
+    statsd.increment('api.delete');
     const credentials = getCredentials(req.headers.authorization)
     const email = credentials[0]
     const user = await User.findOne({ where: { email } });
@@ -153,6 +159,7 @@ router.delete('/:assignmentId', authenticate, async (req, res) => {
 });
 
 router.patch('/*', authenticate, (req, res) => {
+    statsd.increment('api.patch');
     res.status(405).json({ error: 'Method Not Allowed' });
 });
 
