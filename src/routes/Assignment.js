@@ -3,25 +3,27 @@ const router = express.Router();
 const {User, Assignment} = require('../database/index');
 const { authenticate, getCredentials } = require('../../auth')
 const logger = require("../logging/applog")
-const statsd = require('../metrics/metrics')
 router.post('/', authenticate ,async (req, res) => {
     try {
-      statsd.increment('api.post');
       const credentials = getCredentials(req.headers.authorization)
       const email = credentials[0]
       const user = await User.findOne({ where: { email } });
       const userId = user.user_id;
       const { name, points, num_of_attempts, deadline, assignment_created, assignment_updated } = req.body;
       if (!name || !points || !num_of_attempts || !deadline) {
+        logger.info('Invalid request body')
         return res.status(400).json({ message: 'Invalid request body' });
       }
       if(!Number.isInteger(points) || !Number.isInteger(num_of_attempts)){
+        logger.info('Points or Number of attempts must be integer')
         return res.status(400).json({message: 'Points or Number of attempts must be integer'})
       }
       if (typeof name !== 'string') {
+        logger.info('Name must be a string')
         return res.status(400).json({ message: 'Name must be a string' });
       }
       if (typeof deadline !== 'string' || isNaN(Date.parse(deadline))) {
+        logger.info('Deadline must be a valid date')
         return res.status(400).json({ message: 'Deadline must be a valid date' });
       }
       if(assignment_created || assignment_updated) {
@@ -51,7 +53,6 @@ router.post('/', authenticate ,async (req, res) => {
 
 router.get('/', authenticate, async (req, res) => {
   try {
-    statsd.increment('api.get');
     const assignments = await Assignment.findAll({
       attributes: {
         exclude: ['user_id'],
@@ -67,7 +68,6 @@ router.get('/', authenticate, async (req, res) => {
 
 router.get('/:assignmentId', authenticate, async (req, res) => {
   try {
-    statsd.increment('api.getAssignment');
     const assignmentId = req.params.assignmentId;
     const assignment = await Assignment.findByPk(assignmentId, {
       attributes: {
@@ -75,6 +75,7 @@ router.get('/:assignmentId', authenticate, async (req, res) => {
       },
     });
     if (!assignment) {
+      logger.info('Assignment not found');
       return res.status(404).json({ error: 'Assignment not found' });
     }
     logger.info(`Assignment with id ${assignment.assignment_id} fetched successfully `);
@@ -87,7 +88,6 @@ router.get('/:assignmentId', authenticate, async (req, res) => {
 
 router.put('/:assignmentId', authenticate ,async (req, res) => {
     try {
-      statsd.increment('api.put');
       const credentials = getCredentials(req.headers.authorization)
       const email = credentials[0]
       const user = await User.findOne({ where: { email } });
@@ -95,15 +95,19 @@ router.put('/:assignmentId', authenticate ,async (req, res) => {
       const { name, points, num_of_attempts, deadline, assignment_created, assignment_updated } = req.body;
       const assignment = await Assignment.findByPk(req.params.assignmentId)
       if (!assignment) {
+        logger.info('Assignment not found');
         return res.status(404).json({ error: 'Assignment not found' });
       }
       if(!Number.isInteger(points) || !Number.isInteger(num_of_attempts)){
+        logger.info('Points or Number of attempts must be integer');
         return res.status(400).json({message: 'Points or Number of attempts must be integer'})
       }
       if (typeof name !== 'string') {
+        logger.info('Name must be a string');
         return res.status(400).json({ message: 'Name must be a string' });
       }
       if (typeof deadline !== 'string' || isNaN(Date.parse(deadline))) {
+        logger.info('Deadline must be a valid date');
         return res.status(400).json({ message: 'Deadline must be a valid date' });
       }
       if (assignment.user_id !== userId) {
@@ -111,6 +115,7 @@ router.put('/:assignmentId', authenticate ,async (req, res) => {
         return res.status(403).json({ error: 'Forbidden - You do not have permission to update this assignment' });
       }
       if (!name || !points || !num_of_attempts || !deadline) {
+        logger.info('Invalid request body');
         return res.status(400).json({ message: 'Invalid request body' });
       }
       if(assignment_created || assignment_updated) {
@@ -135,7 +140,6 @@ router.put('/:assignmentId', authenticate ,async (req, res) => {
 
 router.delete('/:assignmentId', authenticate, async (req, res) => {
   try {
-    statsd.increment('api.delete');
     const credentials = getCredentials(req.headers.authorization)
     const email = credentials[0]
     const user = await User.findOne({ where: { email } });
@@ -143,6 +147,7 @@ router.delete('/:assignmentId', authenticate, async (req, res) => {
     const assignmentId = req.params.assignmentId;
     const assignment = await Assignment.findByPk(assignmentId);
     if (!assignment) {
+      logger.info('Assignment not found');
       return res.status(404).json({ error: 'Assignment not found' });
     }
     if (assignment.user_id !== userId) {
@@ -159,7 +164,6 @@ router.delete('/:assignmentId', authenticate, async (req, res) => {
 });
 
 router.patch('/*', authenticate, (req, res) => {
-    statsd.increment('api.patch');
     res.status(405).json({ error: 'Method Not Allowed' });
 });
 

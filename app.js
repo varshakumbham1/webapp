@@ -36,10 +36,12 @@ app.get('/healthz', async (req, res) => {
         statsd.increment('api.healthz');
         res.set('Cache-Control', 'no-cache');
         if(Object.keys(req.body).length > 0) {
-            res.status(400).send();
+          logger.info('The request does not contain body')
+          res.status(400).send();
         }
         if(Object.keys(req.query).length > 0) {
-            res.status(400).send()
+          logger.info('The request does not contain query params')
+          res.status(400).send()
         }
         else {
             await sequelize.authenticate()
