@@ -3,6 +3,7 @@ const Sequelize = require('sequelize')
 const mysql = require("mysql2/promise");
 const UserModel = require("../models/User");
 const AssignmentModel = require("../models/Assignment");
+const SubmissionModel = require("../models/Submission")
 
 require('dotenv').config();
 const database = process.env.DB_NAME
@@ -18,6 +19,7 @@ const sequelize = new Sequelize(database, user, password, {
 
 const User = UserModel(sequelize);
 const Assignment = AssignmentModel(sequelize);
+const Submission = SubmissionModel(sequelize)
 
 const syncDatabase = async () => {
   await sequelize.sync({ alter: true });
@@ -39,4 +41,5 @@ module.exports = {
   syncDatabase,
   User,
   Assignment,
+  Submission,
 };

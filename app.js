@@ -1,5 +1,5 @@
 const express = require('express')
-const {sequelize, createDatabase, syncDatabase, User, Assignment} = require('./src/database/index')
+const {sequelize, createDatabase, syncDatabase, User, Assignment, Submission} = require('./src/database/index')
 const { authenticate, getCredentials } = require('./auth')
 const assignmentRouter = require('./src/routes/Assignment');
 const app = express()
@@ -23,10 +23,17 @@ app.use(express.json());
 })();
 
 User.hasMany(Assignment, {
-    foreignKey: 'user_id', 
+  foreignKey: 'user_id', 
 });
 Assignment.belongsTo(User, {
-    foreignKey: 'user_id', 
+  foreignKey: 'user_id', 
+});
+
+Assignment.hasMany(Submission, {
+  foreignKey: 'assignment_id', 
+});
+Submission.belongsTo(Assignment, {
+  foreignKey: 'assignment_id', 
 });
 
 app.use('/v1/assignments', assignmentRouter);

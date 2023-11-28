@@ -10,7 +10,7 @@ const model = (sequelize) => {
 			primaryKey:true
 		},
 		first_name: { type: Sequelize.STRING, allowNull:false },
-	last_name: { type: Sequelize.STRING, allowNull:false },
+		last_name: { type: Sequelize.STRING, allowNull:false },
 		email: { type: Sequelize.STRING, unique: true, allowNull:false },
 		password: { type: Sequelize.STRING, allowNull:false, writeonly:true},
 		account_created: Sequelize.DATE,
@@ -27,11 +27,5 @@ const model = (sequelize) => {
 	});
 	return User
 }
-
-// User.beforeCreate(async (user) => {
-//   const saltRounds = 10;
-//   const hashedPassword = await bcrypt.hash(user.password, saltRounds);
-//   user.password = hashedPassword;
-// });
 
 module.exports = model;

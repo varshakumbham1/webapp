@@ -1,8 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const {User, Assignment} = require('../database/index');
+const {sequelize, User, Assignment, Submission} = require('../database/index');
 const { authenticate, getCredentials } = require('../../auth')
 const logger = require("../logging/applog")
+require('dotenv').config();
+const topic_arn = process.env.SNS_TOPIC_ARN 
+const AWS = require('aws-sdk');
+const sns = new AWS.SNS();
+
 router.post('/', authenticate ,async (req, res) => {
     try {
       const credentials = getCredentials(req.headers.authorization)
@@ -71,7 +76,7 @@ router.get('/:assignmentId', authenticate, async (req, res) => {
     const assignmentId = req.params.assignmentId;
     const assignment = await Assignment.findByPk(assignmentId, {
       attributes: {
-        exclude: ['user_id'],
+        exclude: ['user_id'], 
       },
     });
     if (!assignment) {
@@ -166,5 +171,65 @@ router.delete('/:assignmentId', authenticate, async (req, res) => {
 router.patch('/*', authenticate, (req, res) => {
     res.status(405).json({ error: 'Method Not Allowed' });
 });
+
+router.post('/:assignmentId/submission', authenticate, async (req, res) => {
+  try {
+    const credentials = getCredentials(req.headers.authorization)
+    const email = credentials[0]
+    const user = await User.findOne({ where: { email } });
+    if(user) {
+      const assignmentId = req.params.assignmentId;
+      const assignment = await Assignment.findByPk(assignmentId);
+      const { submission_url } = req.body;
+      if (!assignment) {
+        return res.status(404).json({ error: 'Assignment not found' });
+      }
+      const currentDateTime = new Date();
+      if (currentDateTime > assignment.deadline) {
+        return res.status(400).json({ error: 'Deadline has passed, submission rejected' });
+      }
+      const count_of_attempts = await Submission.count({
+        where: { assignment_id: assignmentId },
+      });
+      if (count_of_attempts >= assignment.num_of_attempts) {
+        return res.status(400).send('No more submission attempts allowed');
+      }
+      const submission = await Submission.create({
+        assignment_id : assignmentId,
+        submission_url,
+      }).then((submission) => {
+        const submissionResponse = {...submission.toJSON()}
+        delete submissionResponse.user_id
+        const user_email = user.email;
+        logger.info(`Assignment Submitted successfully with id: ${submissionResponse.submission_id}`);
+        const snsMessage = {
+          user_email: user_email,
+          submission_url: submissionResponse.submission_url,
+          message: `Assignment submitted by ${user_email}: ${submissionResponse.submission_url}`
+        }
+        const snsParams = {
+          Message: JSON.stringify(snsMessage),
+          TopicArn: topic_arn,
+        };
+        sns.publish(snsParams, (err, data) => {
+          if (err) {
+            logger.error(`Error publishing message to SNS: ${err}`);
+          } else {
+            logger.info(`Message published to SNS with messageId: ${data.MessageId}`);
+          }
+        });
+        return res.status(201).send(submissionResponse);
+      })
+      .catch((error) => {
+        logger.error(`Cannot submit the assignment due to an error ${error}`);
+        return res.status(400).end();
+      });
+    }
+  }
+  catch(error) {
+    logger.error(`Error occurred ${error}`);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+})
 
 module.exports = router;
