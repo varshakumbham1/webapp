@@ -201,13 +201,12 @@ router.post('/:assignmentId/submission', authenticate, async (req, res) => {
         submission_url,
       }).then((submission) => {
         const submissionResponse = {...submission.toJSON()}
-        delete submissionResponse.user_id
         const user_email = user.email;
         logger.info(`Assignment Submitted successfully with id: ${submissionResponse.submission_id}`);
         const snsMessage = {
           user_email: user_email,
           submission_url: submissionResponse.submission_url,
-          message: `Assignment submitted by ${user_email}: ${submissionResponse.submission_url}`
+          count_of_attempts: count_of_attempts,
         }
         const snsParams = {
           Message: JSON.stringify(snsMessage),
