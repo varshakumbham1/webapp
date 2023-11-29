@@ -186,15 +186,18 @@ router.post('/:assignmentId/submission', authenticate, async (req, res) => {
       if (!assignment) {
         return res.status(404).json({ error: 'Assignment not found' });
       }
+      if (!submission_url) {
+        return res.status(404).json({ error: 'Enter the Submission url' });
+      }
       const currentDateTime = new Date();
       if (currentDateTime > assignment.deadline) {
-        return res.status(400).json({ error: 'Deadline has passed, submission rejected' });
+        return res.status(403).json({ error: 'Deadline has passed, submission rejected' });
       }
       const count_of_attempts = await Submission.count({
         where: { assignment_id: assignmentId },
       });
       if (count_of_attempts >= assignment.num_of_attempts) {
-        return res.status(400).send('No more submission attempts allowed');
+        return res.status(403).send('No more submission attempts allowed');
       }
       const submission = await Submission.create({
         assignment_id : assignmentId,
