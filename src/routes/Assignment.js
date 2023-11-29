@@ -6,6 +6,7 @@ const logger = require("../logging/applog")
 require('dotenv').config();
 const topic_arn = process.env.SNS_TOPIC_ARN 
 const AWS = require('aws-sdk');
+AWS.config.update({ region: process.env.AWS_REGION });
 const sns = new AWS.SNS();
 
 router.post('/', authenticate ,async (req, res) => {
