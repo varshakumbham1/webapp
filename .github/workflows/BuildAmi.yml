@@ -72,8 +72,7 @@ jobs:
       - name: Create Launch Template version
         id: create-launch-template-version
         run: |
-          latest_launch_template_id=$(aws ec2 create-launch-template --launch-template-name latest-template-for-auto-scaling --version-description version1 \
-          --launch-template-data '{"ImageId":${latest_ami_id}' )
+          latest_launch_template_id=$(aws ec2 create-launch-template-version --launch-template-id ${launch_template_id} --version-description WebVersion2 --source-version 1 --launch-template-data '{"ImageId":${latest_ami_id}}')
           echo "${latest_launch_template_id}"
       - name: Update Autoscaling Group Launch Template
         run: |
