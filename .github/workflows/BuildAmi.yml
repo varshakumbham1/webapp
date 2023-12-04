@@ -65,20 +65,19 @@ jobs:
       - name: Get the latest AMI ID
         id: get-ami-id
         run: |
-          latest_ami_id=$(aws ec2 describe-images --filters "Name=name,Values=csye6225_*" --query 'Images | sort_by(@, &CreationDate) | [-1].ImageId' --output text)
-          echo "${latest_ami_id}"
+          ami_id=$(aws ec2 describe-images --filters "Name=name,Values=csye6225_*" --query 'Images | sort_by(@, &CreationDate) | [-1].ImageId' --output text)
+          echo "${ami_id}"
           launch_template_id=$(aws ec2 describe-launch-templates --launch-template-names ASG_Launch_Template --query 'LaunchTemplates[*].LaunchTemplateId')
           echo "${launch_template_id}"
       - name: Create Launch Template version
         id: create-launch-template-version
         run: |
-          latest_launch_template_id=$(aws ec2 create-launch-template-version --launch-template-id ${launch_template_id} --version-description WebVersion2 --source-version 1 --launch-template-data '{"ImageId":${latest_ami_id}}')
-          echo "${latest_launch_template_id}"
+          aws ec2 create-launch-template-version --launch-template-name ASG_Launch_Template --version-description WebVersion2 --source-version 1 --launch-template-data "ImageId=$ami_ID"
       - name: Update Autoscaling Group Launch Template
         run: |
           aws autoscaling update-auto-scaling-group \
             --auto-scaling-group-name auto_scaling_group \
-            --launch-template "LaunchTemplateId=${latest_launch_template_id},Version=$Latest"
+            --launch-template "LaunchTemplateId=$launch_template_id,Version=$Latest"
       - name: Initiate Instance Refresh
         run: |
           aws autoscaling start-instance-refresh \
