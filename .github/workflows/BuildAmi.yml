@@ -65,7 +65,7 @@ jobs:
       - name: Get the latest AMI ID
         id: get-ami-id
         run: |
-          ami_ID=$(aws ec2 describe-images --filters "Name=name,Values=csye6225_*" "Name=owner-id,Values=727174796110" --query "reverse(sort_by(Images, &CreationDate))[0].ImageId")
+          ami_id=$(aws ec2 describe-images --filters "Name=name,Values=csye6225_*" "Name=owner-id,Values=727174796110" --query "reverse(sort_by(Images, &CreationDate))[0].ImageId")
           launch_template_id=$(aws ec2 describe-launch-templates --launch-template-names ASG_Launch_Template --query 'LaunchTemplates[0].LaunchTemplateId')
       - name: Create Launch Template version
         id: create-launch-template-version
