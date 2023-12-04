@@ -55,3 +55,42 @@ jobs:
         run: packer init .
       - name: Build packer file
         run: packer build .
+      - name: Configure Demo AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.DEMO_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEMO_AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+          aws-profile: demo
+      - name: Get the latest AMI ID
+        id: get-ami-id
+        run: |
+          latest_ami_id=$(aws ec2 describe-images --filters "Name=name,Values=csye6225_*" --query 'Images | sort_by(@, &CreationDate) | [-1].ImageId' --output text)
+          echo "${latest_ami_id}"
+          launch_template_id=$(aws ec2 describe-launch-templates --launch-template-names ASG_Launch_Template --query 'LaunchTemplates[*].LaunchTemplateId')
+          echo "${launch_template_id}"
+      - name: Create Launch Template version
+        id: create-launch-template-version
+        run: |
+          latest_launch_template_id=$(aws ec2 create-launch-template --launch-template-name latest-template-for-auto-scaling --version-description version1 \
+          --launch-template-data '{"ImageId":${latest_ami_id}' )
+          echo "${latest_launch_template_id}"
+      - name: Update Autoscaling Group Launch Template
+        run: |
+          aws autoscaling update-auto-scaling-group \
+            --auto-scaling-group-name auto_scaling_group \
+            --launch-template "LaunchTemplateId=${latest_launch_template_id},Version=$Latest"
+      - name: Initiate Instance Refresh
+        run: |
+          aws autoscaling start-instance-refresh \
+            --auto-scaling-group-name auto_scaling_group
+      - name: Wait for Instance Refresh to Complete
+        run: |
+          status="InProgress"
+          while [ "$status" == "InProgress" ]; do
+            sleep 60  # Adjust the sleep interval as needed
+            status=$(aws autoscaling describe-instance-refreshes \
+                      --auto-scaling-group-name auto_scaling_group \
+                      --query 'InstanceRefreshes[0].Status' \
+                      --output text)
+          done
