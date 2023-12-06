@@ -8,7 +8,7 @@ const authenticate = async (req, res, next) => {
       statsd.increment('api.post');
     }
     else if (req.method === 'GET') {
-      if (req.originalUrl.startsWith('/v1/assignments/')) {
+      if (req.originalUrl.startsWith('/v2/assignments/')) {
         const assignmentId = req.params.assignmentId;
         if (assignmentId) {
           statsd.increment('api.getAssignment');

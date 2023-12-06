@@ -36,7 +36,7 @@ Submission.belongsTo(Assignment, {
   foreignKey: 'assignment_id', 
 });
 
-app.use('/v1/assignments', assignmentRouter);
+app.use('/v2/assignments', assignmentRouter);
 
 app.get('/healthz', async (req, res) => {
     try {
